@@ -2,10 +2,10 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open('period-tracker-cache').then(async (cache) => {
             const urlsToCache = [
-                '/PeriodTracker/index.html',  // Explicitly reference index.html
-                '/PeriodTracker/styles.css',
-                '/PeriodTracker/main.js',
-                '/PeriodTracker/icons/AppIcon128.png'
+                '/LunaCycle/index.html',  // Explicitly reference index.html
+                '/LunaCycle/styles.css',
+                '/LunaCycle/main.js',
+                '/LunaCycle/icons/AppIcon128.png'
             ];
             
             for (const url of urlsToCache) {
