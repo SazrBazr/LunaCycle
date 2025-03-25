@@ -1,0 +1,993 @@
+/* Updated CSS */
+:root {
+    --accent-color: #ce83a7;
+    --accent-dark-color: #ce5790;
+    --primary-color: #FF7EB6;
+    --secondary-color: #FF65A3;
+    --background-color: #FFF9FB;
+    --text-color: #2E2E2E;
+    --card-bg: #FFFFFF;
+    --shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+/* Enhanced Prediction Circle */
+#prediction-circle {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 10px 30px rgba(255, 126, 182, 0.3);
+    width: 180px;
+    height: 180px;
+    margin: -90px auto 30px;
+}
+
+/* Improved Input Fields */
+input, select {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    margin: 8px 0;
+    transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Modern Button Styles */
+button {
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#save-day-btn {
+    background: linear-gradient(135deg, #FF9A9E, #FF7EB6);
+}
+
+#start-period-btn {
+    background: linear-gradient(135deg, #7FD8BE, #5DC9A8);
+}
+
+#end-period-btn {
+    background: linear-gradient(135deg, #FF7676, #FF6565);
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    #dashboard {
+        padding-bottom: 80px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .symptoms {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Hover Effects */
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Loading Spinner Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Improved Settings Modal */
+#settings-section {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 1001;
+    background: var(--card-bg);
+    border-radius: 20px;
+}
+
+/* Overlay Effect */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+/* Modern Radio Buttons */
+.gender input[type="radio"] + label {
+    padding: 12px 20px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.gender input[type="radio"]:checked + label {
+    border-color: var(--primary-color);
+    background: rgba(255,126,182,0.1);
+}
+
+/* Enhanced Stats Cards */
+.stat {
+    padding: 25px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat h2 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.stat p {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+
+
+
+
+
+
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+#settings-section {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+#settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#settings-form label {
+    font-weight: bold;
+}
+
+#settings-form input, #settings-form select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#settings-form button {
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#settings-form button:hover {
+    background-color: var(--accent-dark-color);
+}
+
+#settings-btn{
+    margin-right: 10px;
+}
+
+.calendar-day {
+    padding: 20px 5px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+    position: relative; /* Added to support absolute positioning of dots */
+}
+
+.today {
+    border: 2px solid var(--accent-dark-color);
+}
+
+.indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute; /* To keep the dots inside the cell */
+    bottom: 8px; /* Adjust to avoid clipping */
+    z-index: 10; /* Keep it on top of text */
+    width: 100%;
+    left: 0;
+}
+
+.indicators span.dot {
+    width: 10px; /* Adjust size of dots */
+    height: 10px;
+    border-radius: 50%;
+    margin: 2px;
+}
+
+.indicators .fertile {
+    background-color: #00897B;
+}
+
+.indicators .period {
+    background-color: #D32F2F;
+}
+
+.indicators .symptomsCell {
+    background-color: #7E57C2;
+}
+
+.keyMap {
+    display: flex; /* Use flexbox to keep dots and text aligned */
+    flex-direction: column;
+    gap: 5px; /* Adjust spacing between items */
+}
+
+.keyItem {
+    display: flex;
+    align-items: center; /* Align dot and text vertically */
+    gap: 8px; /* Space between dot and text */
+}
+
+.keyMap .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0;
+}
+
+.keyMap .fertile {
+    background-color: #00897B;
+}
+
+.keyMap .period {
+    background-color: #D32F2F;
+}
+
+.keyMap .symptomsCell {
+    background-color: #7E57C2;
+}
+
+.symptoms-for-day{
+    padding: 10px;
+}
+
+#loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000; /* Ensure it's on top of everything */
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #007bff; /* Blue color for the spinner */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite; /* Spin animation */
+}
+
+@keyframes spin {
+    0% {
+    transform: rotate(0deg);
+    }
+    100% {
+    transform: rotate(360deg);
+    }
+}
+
+label{
+    user-select: none;
+}
+
+.messageBox {
+    margin-bottom: 20px;
+    max-width: 300px;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 2px solid var(--accent-color);
+}
+.messageBox:focus-within {
+    border: 3px solid var(--accent-dark-color);
+}
+#messageInput {
+    margin-left: 10px;
+    width: 90%;
+    height: 100%;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    color: black;
+}
+#messageInput:focus ~ #sendButton svg path,
+#messageInput:valid ~ #sendButton svg path {
+    stroke: var(--accent-dark-color);
+}
+
+#sendButton {
+    height: 100%;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+#sendButton svg {
+    height: 18px;
+    transition: all 0.3s;
+}
+#sendButton svg path {
+    transition: all 0.3s;
+}
+#sendButton:hover svg path {
+    stroke: var(--accent-dark-color);
+}
+
+.btn-container{
+    width: 100%;
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.checkbox-wrapper-47{
+    z-index: 2;
+}
+
+.checkbox-wrapper-47 input[type="checkbox"] {
+    display: none;
+    visibility: hidden;
+}
+
+.checkbox-wrapper-47 label {
+    position: relative;
+    padding-left: 2em;
+    padding-right: 0.25em;
+    line-height: 2;
+    cursor: pointer;
+    display: inline-flex;
+}
+
+.checkbox-wrapper-47 label:before {
+    box-sizing: border-box;
+    content: " ";
+    position: absolute;
+    top: 0.3em;
+    left: 0;
+    display: block;
+    width: 1.4em;
+    height: 1.4em;
+    border: 2px solid #9098A9;
+    border-radius: 6px;
+    z-index: -1;
+}
+
+.checkbox-wrapper-47 input[type=checkbox]:checked + label {
+    padding-left: 1em;
+    color: #0f5229;
+}
+.checkbox-wrapper-47 input[type=checkbox]:checked + label:before {
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #b7e6c9;
+    border-color: #2cbc63;
+}
+
+.checkbox-wrapper-47 label,
+.checkbox-wrapper-47 label::before {
+    transition: 0.25s all ease;
+}
+
+@media (min-width: 768px) {
+    .symptoms {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    button {
+        width: auto;
+        margin-right: 10px;
+    }
+}
+
+.history-container{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns of equal width */
+    gap: 20px; /* Space between grid items */
+}
+
+button{
+    background-color: var(--accent-color);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    border: none;
+}
+
+.tab-content {
+    max-width: 100%;
+    margin: 10px auto;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#calendar-container {
+    margin-bottom: 15px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-cell {
+    padding: 15px 5px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.calendar-cell.empty {
+    background-color: #f7f7f7;
+    border: none;
+}
+
+.calendar-day:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.calendar-day.active {
+    background-color: var(--accent-dark-color);
+    color: #fff;
+}
+
+.calendar-day.disabled {
+    pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#day-details {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 10px;
+}
+
+#flow, #feeling {
+    width: 100%; /* Full width to fit the screen */
+    padding: 12px; /* Add padding for better touch interaction */
+    font-size: 16px; /* Increase font size for readability */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background */
+    appearance: none; /* Remove default arrow in some browsers */
+    -webkit-appearance: none; /* Remove default arrow in Safari */
+    -moz-appearance: none; /* Remove default arrow in Firefox */
+    cursor: pointer; /* Show pointer cursor */
+}
+
+#flow:focus, #feeling:focus {
+    border-color: var(--accent-dark-color); /* Highlight border on focus */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle shadow */
+}
+
+#flow:hover, #feeling:hover {
+    background-color: #e9ecef; /* Change background on hover */
+}
+
+h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+h4 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #444;
+}
+
+.symptoms {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.symptoms label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #555;
+}
+
+.symptoms input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+/* Flow Select */
+label[for="flow"] {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+label[for="feeling"] {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+#flow, #feeling {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Buttons */
+button {
+    display: inline-block;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: var(--accent-color);
+}
+
+#save-day-btn {
+    background-color: #2196F3;
+    color: #fff;
+    width: 100%;
+}
+
+#save-day-btn:hover {
+    background-color: #1e88e5;
+}
+
+#start-period-btn {
+    width: 100%;
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+#start-period-btn:hover {
+    background-color: #45a049;
+}
+
+#end-period-btn {
+    width: 100%;
+    background-color: #f44336;
+    color: #fff;
+}
+
+#end-period-btn:hover {
+    background-color: #e53935;
+}
+
+#prediction-circle {
+    text-align: center;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 10px;
+    margin-bottom: -110px;
+    padding: 20px;
+    background-color: var(--accent-color);
+    outline: 20px solid #f7f7f7; /* Outer border effect */
+    color: white;
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1; /* Ensures the prediction circle is below the menu */
+}
+
+
+#prediction-circle h3 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+#days-until-period {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+#prediction-circle p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#prediction-circle {
+    animation: pulse 2s infinite;
+}
+
+input[type=radio] {
+    visibility: hidden;
+}
+
+label.radio {
+    cursor: pointer;
+    text-indent: 35px;
+    overflow: visible;
+    display: inline-block;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+label.radio:before {
+    background: #3a57af;
+    content:'';
+    position: absolute;
+    top:2px;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+}
+
+label.radio:after {
+	opacity: 0;
+	content: '';
+	position: absolute;
+	width: 0.5em;
+	height: 0.25em;
+	background: transparent;
+	top: 7.5px;
+	left: 4.5px;
+	border: 3px solid #ffffff;
+	border-top: none;
+	border-right: none;
+
+	-webkit-transform: rotate(-45deg);
+	-moz-transform: rotate(-45deg);
+	-o-transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+}
+
+input[type=radio]:checked + label:after {
+	opacity: 1;
+}
+
+.gender {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+/* Dashboard */
+#dashboard {
+    display: none;
+    padding: 20px;
+}
+
+#app {
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+/* Auth Container */
+#auth-container {
+    padding: 20px;
+    text-align: center;
+}
+
+#auth-container h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#auth-container input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#auth-container button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#auth-container button:hover {
+    background-color: var(--accent-dark-color);
+}
+
+/* Dashboard */
+#dashboard {
+    display: none;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#dashboard-tab{
+   padding-top: 150px; 
+}
+
+header h2 {
+    font-size: 1.5rem;
+}
+
+#logout-btn {
+    padding: 10px 15px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#logout-btn:hover {
+    background-color: var(--accent-dark-color);
+}
+
+/* Female-only content */
+.female-only {
+    display: none;
+}
+
+body.female .female-only {
+    display: block;
+}
+
+body.male .female-only {
+    display: none !important;
+}
+
+/* Input Groups */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#save-period-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#save-period-btn:hover {
+    background-color: #ff4c4c;
+}
+
+/* Cycle History */
+#cycle-history, #symptoms-history,
+#invitations-list {
+    list-style-type: none;
+}
+
+#cycle-history li, #symptoms-history li,
+#invitations-list li {
+    background: #f7f7f7;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.cycle-analysis, .symptom-tracking, .nutrition-tips {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f7f7f7;
+    border-radius: 5px;
+}
+
+#cycle-stats p, #tips-list li, #nutrition-tips-content {
+    margin: 10px 0;
+}
+
+#save-symptoms-btn {
+    padding: 10px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#save-symptoms-btn:hover {
+    background-color: #ff4c4c;
+}
+
+.stats-tab {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Container for the stats grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+    gap: 20px; /* Space between cards */
+    padding: 20px;
+}
+
+/* Individual stat card */
+.stat {
+    position: relative; /* Needed for absolute positioning of the info icon */
+    background: #ffffff; /* White background */
+    border: 1px solid #e0e0e0; /* Light border */
+    border-radius: 12px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+}
+
+/* Hover effect for cards */
+.stat:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+/* Info icon positioning */
+.stat .info {
+    position: absolute; /* Position relative to the card */
+    top: 30px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    cursor: pointer; /* Indicates it's clickable */
+    opacity: 0.7; /* Slightly transparent */
+    transition: opacity 0.2s ease; /* Smooth hover effect */
+}
+
+/* Tooltip styling */
+.info-card {
+    display: none; /* Hidden by default */
+    position: absolute;
+    bottom: 100%; /* Position above the tooltip */
+    right: 0%;
+    background-color: #333; /* Dark background */
+    color: #fff; /* White text */
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap; /* Prevent text from wrapping */
+    z-index: 10; /* Ensure it's above other elements */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.info-card::before {
+    content: '';
+    position: absolute;
+    top: 100%; /* Position above the tooltip */
+    right: 20px; /* Distance from the right */
+    transform: translateX(-50%) rotate(180deg);
+    z-index: 10; /* Ensure it's above other elements */
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent; /* Arrow pointing down */
+}
+
+/* Show the tooltip when the info icon is clicked */
+.stat.active .info-card {
+    display: block;
+    opacity: 1;
+}
+
+/* Card title styling */
+.stat h2 {
+    font-size: 18px; /* Title size */
+    font-weight: 600; /* Semi-bold */
+    color: #333; /* Dark text */
+    margin-bottom: 10px; /* Space below the title */
+}
+
+/* Card value styling */
+.stat p {
+    font-size: 24px; /* Larger text for the value */
+    font-weight: 700; /* Bold */
+    color: #007bff; /* Blue color for emphasis */
+    margin: 0; /* Remove default margin */
+}
+
+@media (max-width: 600px) {
+    .stats-grid {
+    grid-template-columns: 1fr; /* Single column on small screens */
+    }
+}

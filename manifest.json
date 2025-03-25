@@ -1,0 +1,20 @@
+{
+  "name": "Period Tracker",
+  "short_name": "Period App",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#f7f7f7",
+  "theme_color": "#ff4081",
+  "icons": [
+      {
+          "src": "icons/AppIcon128.png",
+          "sizes": "128x128",
+          "type": "image/png"
+      },
+      {
+          "src": "icons/AppIcon512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+      }
+  ]
+}
