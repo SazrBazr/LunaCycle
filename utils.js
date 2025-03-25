@@ -12,11 +12,7 @@ export function predictNextPeriod(cycles) {
     }
 
     const averageCycleLength = calculateCycleLength(cycles);
-    const lastPeriodEnd = new Date(cycles[0].endDate);
-
-    if (cycles[0].endDate === null || lastPeriodEnd === null) {
-        return 0;
-    }
+    let lastPeriodEnd = new Date(cycles[0].startDate);
 
     const nextPeriodStart = new Date(lastPeriodEnd);
     nextPeriodStart.setDate(lastPeriodEnd.getDate() + averageCycleLength);
