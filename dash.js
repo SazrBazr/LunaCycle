@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         year: 'numeric'
     });
 
-    showDayDetails(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1);
+    showDayDetails(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
     
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -216,12 +216,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             cycles = await getCycleHistory(userData.partner);
         }
     
-        const currentDate = new Date();
+        const currentDateServer = new Date();
+        const localDateTime = currentDateServer.toLocaleString();
         let expectedPeriodStart, expectedPeriodEnd, fertileWindowStartDate, fertileWindowEndDate;
     
         if (cycles.length > 0) {
-            expectedPeriodStart = new Date(currentDate);
-            expectedPeriodStart.setDate(currentDate.getDate() + predictNextPeriod(cycles));
+            expectedPeriodStart = new Date(currentDateServer);
+            expectedPeriodStart.setDate(currentDateServer.getDate() + predictNextPeriod(cycles));
     
             expectedPeriodEnd = new Date(expectedPeriodStart);
             expectedPeriodEnd.setDate(expectedPeriodStart.getDate() + calculateAveragePeriodLength(cycles));
@@ -235,7 +236,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cellDate = new Date(currentYear, currentMonth, inedx + 2);
             const date = cellDate.toISOString().split('T')[0];
 
-            const isToday = date === currentDate.toISOString().split('T')[0];
+            const fyear = currentDateServer.getFullYear();
+            const fmonth = String(currentDateServer.getMonth() + 1).padStart(2, '0'); // Ensure two digits
+            const fday = String(currentDateServer.getDate()).padStart(2, '0');
+            const localDateTimeFormated = `${fyear}-${fmonth}-${fday}`;
+            const isToday = date === localDateTimeFormated;
 
             let isPredictedPeriod = false;
             let isFertile = false;
@@ -286,9 +291,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const user = auth.currentUser;
         if (!user) return;
 
-        clickedDate = new Date(Date.UTC(year, month, day)).toISOString().split('T')[0];
+        clickedDate = new Date(year, month, day + 1).toISOString().split('T')[0];
         // Fetch symptoms for the selected date
+        alert(clickedDate);
         const querySnapshot = await getSymptomsForDate(user.uid, clickedDate);
+
+        clickedDate = new Date(year, month, day).toLocaleString().split(',')[0];
+
 
         if (!querySnapshot.empty) {
             // Assuming each document contains symptoms as an array
@@ -312,12 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     
-        const localDate = new Date(clickedDate + 'T00:00:00Z'); // Ensure UTC interpretation
-        document.getElementById('selected-date').textContent = localDate.toLocaleDateString('es-CL', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+        document.getElementById('selected-date').textContent = `${day}-${month}-${year}`;
         document.getElementById('day-details').style.display = 'block';
     }    
 
@@ -461,15 +465,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     
         try {
             // Add symptoms to the symptoms subcollection under the latest cycle
+            const [month, day, year] = clickedDate.split('/');
+            const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
             await addSymptomData(user.uid, {
-                date: clickedDate,
+                date: formattedDate,
                 symptoms: symptoms,
                 flow: flow,
                 feeling: feeling,
                 timestamp: new Date()
             });
             alert('Symptoms and flow logged!');
-            symptomsModal.style.display = 'none';
+            renderCalendar();
         } catch (error) {
             alert('Error logging symptoms and flow: ' + error.message);
         }
