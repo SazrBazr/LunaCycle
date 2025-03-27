@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = auth.currentUser;
         if (!user) return;
 
-        clickedDate = new Date(year, month, day + 1).toISOString().split('T')[0];
+        clickedDate = new Date(Date.UTC(year, month, day)).toISOString().split('T')[0];
         // Fetch symptoms for the selected date
         const querySnapshot = await getSymptomsForDate(user.uid, clickedDate);
 
@@ -286,7 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
     
-        document.getElementById('selected-date').textContent = clickedDate;
+        const localDate = new Date(clickedDate + 'T00:00:00Z'); // Ensure UTC interpretation
+        document.getElementById('selected-date').textContent = localDate.toLocaleDateString('es-CL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
         document.getElementById('day-details').style.display = 'block';
     }    
 
@@ -471,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 symptoms: symptoms,
                 flow: flow,
                 feeling: feeling,
-                timestamp: new Date()
+                timestamp: new Date().toISOString()
             });
             alert('Symptoms and flow logged!');
             symptomsModal.style.display = 'none';
