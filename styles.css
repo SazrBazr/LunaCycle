@@ -10,6 +10,34 @@
     --shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    margin: 0;
+}
+
+#symptoms-for-day{
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#edit-day-btn{
+    margin-top: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
 /* Enhanced Prediction Circle */
 #prediction-circle {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -136,26 +164,6 @@ button:hover {
     color: var(--text-color);
 }
 
-
-
-
-
-
-
-/* General Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f7f7f7;
-    color: #333;
-    line-height: 1.6;
-    padding: 20px;
-}
 
 #settings-section {
     margin-top: 20px;

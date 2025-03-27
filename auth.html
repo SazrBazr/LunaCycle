@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Period Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/f593e83418.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="auth-container">
+    <h1>🌺 Period Tracker</h1>
+
+    <!-- Login Form -->
+    <div id="login-form">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <button id="login-btn">Login</button>
+      <p>Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signup-form" style="display: none;">
+      <h2>Sign Up</h2>
+      <input type="email" id="signup-email" placeholder="Email">
+      <input type="text" id="signup-username" placeholder="Username">
+      <div class="gender">
+        <input type="radio" value="Female" id="female" name="gender" checked/>
+        <label for="female" class="radio">Female</label>
+        <input type="radio" value="Male" id="male" name="gender"/>
+        <label for="male" class="radio">Male</label>
+      </div> 
+      <input type="password" id="signup-password" placeholder="Password">
+      <input type="password" id="signup-confirm-password" placeholder="Confirm Password">
+      <button id="signup-btn">Sign Up</button>
+      <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    // auth.js
+    import { auth } from './firebaseConfig.js';
+    import { signInWithEmailAndPassword, sendEmailVerification , createUserWithEmailAndPassword, signOut, onAuthStateChanged, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-auth.js";
+
+    // Redirect to dashboard if logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "dashboard.html";
+      }
+    });
+
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html"; // Redirect on success
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    document.getElementById("signup-btn").addEventListener("click", async () => {
+        const signupEmail = document.getElementById('signup-email');
+        const signupUsername = document.getElementById('signup-username');
+        const signupPassword = document.getElementById('signup-password');
+        const signupConfirmPassword = document.getElementById('signup-confirm-password');
+
+        const email = signupEmail.value.trim();
+        const username = signupUsername.value.trim();
+        const password = signupPassword.value.trim();
+        const confirmPassword = signupConfirmPassword.value.trim();
+
+        const genderRadios = document.querySelectorAll('input[name="gender"]');
+        let selectedGender = null;
+        genderRadios.forEach(radio => {
+            if (radio.checked) {
+                selectedGender = radio.value;
+            }
+        });
+
+        if (!email || !username || !password || !confirmPassword || !selectedGender) {
+            alert('Please fill in all fields.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match.');
+            return;
+        }
+
+        try {
+            const user = await signup(email, password);
+            
+            await setUserData(user.uid, {
+                email: email,
+                username: username,
+                gender: selectedGender,
+                uid: user.uid
+            });
+            const userData = await getUserData(user.uid);
+            showDashboard(userData);
+        } catch (error) {
+            alert(error.message);
+        }
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html"; // Redirect on success
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  </script>
+</body>
+</html>

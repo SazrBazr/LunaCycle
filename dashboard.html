@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Period Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- <link rel="icon" href="icons/appIcon128.png" type="image/png"> -->
+  <link rel="icon" sizes="512x512" href="icons/AppIcon512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <!-- <link rel="icon" sizes="192x192" href="icons/appIcon192.png"> -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <script src="https://kit.fontawesome.com/f593e83418.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Dashboard -->
+    <div id="dashboard">
+      <header>
+        <h2>Welcome, <span id="username"></span>!</h2>
+        <button id="settings-btn">Settings</button>
+      </header>
+
+      <!-- Settings Section -->
+      <div id="settings-section" style="display: none;">
+        <h2>Settings</h2>
+        <form id="settings-form">
+          <label for="settings-username">Username</label>
+          <input type="text" id="settings-username" placeholder="Username">
+
+          <label for="settings-gender">Gender</label>
+          <select id="settings-gender">
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+          </select>
+
+          <label for="settings-avg-cycle-length">Average Cycle Length (days)</label>
+          <input type="number" id="settings-avg-cycle-length" placeholder="Average Cycle Length">
+
+          <label for="settings-avg-period-length">Average Period Length (days)</label>
+          <input type="number" id="settings-avg-period-length" placeholder="Average Period Length">
+
+          <button type="submit">Save Changes</button>
+          <button id="logout-btn">Logout</button>
+        </form>
+      </div>
+      <div id="dash-data">
+        <!-- Prediction Circle -->
+        <div id="prediction-circle">
+          <h3>Your Period is in</h3>
+          <div id="days-until-period">?</div>
+          <p>days</p>
+        </div>
+        <!-- Wrap the existing sections in tab containers -->
+        <div id="dashboard-tab" class="tab-content active">
+          <div id="female-only" class="female-only dashboard-without-circle" style="display: none;">
+            <section id="invitations-section" class="sharing" style="display: none;">
+              <h3>Share With Your Partner</h3>
+              <div class="messageBox">
+                <input required="" placeholder="Message..." type="text" id="messageInput" />
+                <button id="sendButton">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 664 663">
+                    <path
+                      fill="none"
+                      d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"
+                    ></path>
+                    <path
+                      stroke-linejoin="round"
+                      stroke-linecap="round"
+                      stroke-width="33.67"
+                      stroke="#6c6c6c"
+                      d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"
+                    ></path>
+                  </svg>
+                </button>
+              </div>            
+            </section>
+
+            <h3>Nutrition Tips</h3>
+            <section class="nutrition-tips">
+              <div id="nutrition-tips-content">
+                Maintain a balanced diet with whole foods, lean proteins, and plenty of vegetables.
+              </div>  
+            </section>
+          </div>
+
+          <!-- Shared content for both genders -->
+          <section id="invitations-section" class="sharing" style="display: none;">
+            <h3>Invitations</h3>
+            <ul id="invitations-list">There is no invitations waiting for you</ul>
+          </section>
+
+          <section class="history">
+            <div>
+              <h3>Symptoms History</h3>
+              <ul id="symptoms-history">No data yet!</ul>
+            </div>
+            <div>
+              <h3>Cycle History</h3>
+              <ul id="cycle-history">No data yet!</ul>
+            </div>
+          </section>
+        </div>
+        <div id="tracking-tab" class="tab-content">
+          <h3>Calendar</h3>
+          <div class="keyMap">
+            <div class="keyItem">
+                <div class="dot fertile"></div>
+                <span>Fertile Days</span>
+            </div>
+            <div class="keyItem">
+                <div class="dot symptomsCell"></div>
+                <span>Days You Had Symptoms</span>
+            </div>
+            <div class="keyItem">
+                <div class="dot period"></div>
+                <span>Next Predicted Period Days</span>
+            </div>
+          </div>  
+          <br>      
+          <div></div>
+          <div></div>
+          <div id="calendar-container">
+              <div id="calendar">
+                  <div class="calendar-header">
+                      <button id="prev-month">&lt;</button>
+                      <h1 id="current-month">Month Year</h1>
+                      <button id="next-month">&gt;</button>
+                  </div>
+                  <div id="calendar-grid"></div>
+              </div>
+          </div>
+          <h4 id="selected-date">Selected Date</h4>
+          <div id="symptoms-for-day" style="display: none;">
+            <div id="dayEmotion"></div>
+            <div id="dayFlow"></div>
+            <div id="daySymptoms"></div>
+            <button id="edit-day-btn">Edit</button>
+            <button id="delete-day-btn">Delete</button>
+          </div>
+          <div class="female-only" id="day-details" style="display: none;">
+            <h3>Symptoms:</h3>
+            <div class="symptoms">
+              <div class="checkbox-wrapper-47">
+                <input id="ac" type="checkbox" name="symptoms" value="Abdominal Cramps" class="s-check-box">
+                <label for="ac">Abdominal Cramps</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="ms" type="checkbox" name="symptoms" value="Mood Swings" class="s-check-box">
+                <label for="ms">Mood Swings</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="ha" type="checkbox" name="symptoms" value="Headache" class="s-check-box">
+                <label for="ha">Headache</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="blo" type="checkbox" name="symptoms" value="Bloating" class="s-check-box">
+                <label for="blo">Bloating</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="ap-ch" type="checkbox" name="symptoms" value="Appetite Changes" class="s-check-box">
+                <label for="ap-ch">Appetite Changes</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="fati" type="checkbox" name="symptoms" value="Fatigue" class="s-check-box">
+                <label for="fati">Fatigue</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="bi" type="checkbox" name="symptoms" value="Bladder Incontinence" class="s-check-box">
+                <label for="bi">Bladder Incontinence</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="acne" type="checkbox" name="symptoms" value="Acne" class="s-check-box">
+                <label for="acne">Acne</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="bp" type="checkbox" name="symptoms" value="Breast Pain" class="s-check-box">
+                <label for="bp">Breast Pain</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input id="chi" type="checkbox" name="symptoms" value="Chills" class="s-check-box">
+                <label for="chi">Chills</label>
+              </div>
+            </div>
+
+            <label for="feeling">Emotion</label>
+            <select id="feeling">
+                <option class="options" value="Calm">Calm</option>
+                <option class="options" value="Exhausted ">Exhausted</option>
+                <option class="options" value="Anxious">Anxious</option>
+                <option class="options" value="Emotional">Emotional</option>
+                <option class="options" value="Sensitive">Sensitive</option>
+                <option class="options" value="Irritated">Irritated </option>
+            </select>
+
+            <label for="flow">Flow</label>
+            <select id="flow">
+                <option class="options" value="No Flow">No Flow</option>
+                <option class="options" value="Spotting">Spotting</option>
+                <option class="options" value="Light">Light</option>
+                <option class="options" value="Medium">Medium</option>
+                <option class="options" value="Heavy">Heavy</option>
+            </select>
+            <button id="save-day-btn">Save Status</button>
+            <div class="btn-container">
+              <button id="start-period-btn">Start Period</button>
+              <button id="end-period-btn">End Period</button>
+            </div>
+          </div>
+        </div>
+        <div id="stats-tab" class="tab-content">
+          <h3>Stats</h3>
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="info-card">This is the average length of your menstrual cycle.</div>
+              <i class="fas fa-info-circle info fa-xl"></i>
+              <h2>Average Cycle Length</h2>
+              <p id="avg-cycle-length-stat">No data</p>
+            </div>
+            <div class="stat">
+              <div class="info-card">This is the average duration of your period.</div>
+              <i class="fas fa-info-circle info fa-xl"></i>
+              <h2>Average Period Length</h2>
+              <p id="avg-period-length-stat">No data</p>
+            </div>
+            <div class="stat">
+              <div class="info-card">This is the window when ovulation is likely to occur.</div>
+              <i class="fas fa-info-circle info fa-xl"></i>
+              <h2>Ovulation Window</h2>
+              <p id="ovulation-window-stat">No data</p>
+            </div>
+            <div class="stat">
+              <div class="info-card">These are the days when you are most fertile.</div>
+              <i class="fas fa-info-circle info fa-xl"></i>
+              <h2>Fertile Days</h2>
+              <p id="fertile-days-stat">No data</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="dash.js"></script>
+</body>
+</html>

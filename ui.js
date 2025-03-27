@@ -8,7 +8,6 @@ export function showDashboard(userData) {
         console.error("User data is null or undefined.");
         return; // Exit the function if userData is null
     }
-    document.getElementById('auth-container').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
     document.getElementById('username').textContent = userData.username;
     document.body.classList.add(userData.gender);
@@ -51,6 +50,7 @@ export function renderSymptomsHistory(symptoms) {
         const li = document.createElement('li');
         li.innerHTML = `
             <strong>Date:</strong> ${symptom.date|| 'None'}<br>
+            <strong>Emotion:</strong> ${symptom.feeling || 'None'}<br>
             <strong>Symptoms:</strong> ${symptom.symptoms?.join(', ') || 'None'}<br>
             <strong>Flow:</strong> ${symptom.flow || 'Not specified'}
         `;

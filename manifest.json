@@ -1,10 +1,22 @@
 {
-  "name": "Period Tracker",
-  "short_name": "Period App",
-  "start_url": "/LunaCycle/index.html",
+  "name": "Period App",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "service_worker.js"
+  },
   "display": "standalone",
   "background_color": "#f7f7f7",
   "theme_color": "#ff4081",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "js": ["content.js"]
+    }
+  ],
   "icons": [
       {
           "src": "icons/AppIcon128.png",
