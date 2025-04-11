@@ -28,8 +28,13 @@ export function renderCycleHistory(cycles) {
             return;
         }
         const li = document.createElement('li');
-        const startString = cycle.startDate;
-        const endString = cycle.endDate === null? "active" : cycle.endDate;
+        let [year, month, day] = cycle.startDate.split('-');
+        const startString = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+        let endString = "active";
+        if(cycle.endDate !== null){
+            [year, month, day] = cycle.endDate.split('-');
+            endString = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+        }
         li.innerHTML = `
             <strong>Start:</strong> ${startString},<br> <strong>End:</strong> ${endString}<br>
         `;
@@ -47,9 +52,11 @@ export function renderSymptomsHistory(symptoms) {
         if(counter >= 4){
             return;
         }
+        const [year, month, day] = symptom.date.split('-');
+        const sympDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
         const li = document.createElement('li');
         li.innerHTML = `
-            <strong>Date:</strong> ${symptom.date|| 'None'}<br>
+            <strong>Date:</strong> ${sympDate|| 'None'}<br>
             <strong>Emotion:</strong> ${symptom.feeling || 'None'}<br>
             <strong>Symptoms:</strong> ${symptom.symptoms?.join(', ') || 'None'}<br>
             <strong>Flow:</strong> ${symptom.flow || 'Not specified'}

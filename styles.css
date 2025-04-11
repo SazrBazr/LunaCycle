@@ -2,11 +2,11 @@
 :root {
     --accent-color: #ce83a7;
     --accent-dark-color: #ce5790;
-    --primary-color: #FF7EB6;
+    --primary-color: #ECA4B0 ;
     --secondary-color: #FF65A3;
-    --background-color: #FFF9FB;
+    --background-color: #f7f7f7  ;
     --text-color: #2E2E2E;
-    --card-bg: #FFFFFF;
+    --card-bg: #ECA4B0;
     --shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
@@ -19,7 +19,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f7f7f7;
+    background-color: var(--background-color);
     color: #333;
     line-height: 1.6;
     padding: 20px;
@@ -41,6 +41,7 @@ body {
 /* Enhanced Prediction Circle */
 #prediction-circle {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: var(--background-color);
     box-shadow: 0 10px 30px rgba(255, 126, 182, 0.3);
     width: 180px;
     height: 180px;
