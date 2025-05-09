@@ -32,6 +32,39 @@ body {
     padding: 10px;
 }
 
+.symptom-entry {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.symptom-date {
+    font-weight: bold;
+    color: #4a5568;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.symptom-details div {
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2d3748;
+}
+
+.no-symptoms {
+    color: #718096;
+    font-style: italic;
+    padding: 15px;
+    text-align: center;
+}
+
 #edit-day-btn{
     margin-top: 10px;
     padding-right: 20px;

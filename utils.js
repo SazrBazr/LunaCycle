@@ -152,6 +152,13 @@ export function getCurrentCyclePhase(cycles) {
     }
 }
 
+export function parseCycleDates(cycles) {
+    return cycles.map(cycle => ({
+        startDate: new Date(cycle.startDate),
+        endDate: cycle.endDate ? new Date(cycle.endDate) : null
+    }));
+}
+
 export function getNutritionTips(cyclePhase) {
     const nutritionTips = {
         follicular: [

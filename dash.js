@@ -3,7 +3,7 @@ import { auth, db } from './firebaseConfig.js';
 import { logout, checkEmailExists } from './auth.js';
 import { getUserData, setUserData, checkSymptomsForDate, getSymptomsForDate, addCycleData, addSymptomData, getCycleHistory, getCycleHistoryWithId, getUserIdByEmail, sendInvitation, updateUserPartner, getSymptomsHistory } from './firestore.js';
 import { showDashboard, renderCycleHistory, updateUi} from './ui.js';
-import { predictNextPeriod, calculateAveragePeriodLength, calculateOvulationWindow } from './utils.js';
+import { predictNextPeriod, parseCycleDates,calculateAveragePeriodLength, calculateOvulationWindow } from './utils.js';
 import { updateDoc, deleteDoc, doc  } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -61,34 +61,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Date formatting functions
+    // Add these utility functions at the top of your main.js
+    function getLocalDate(date = new Date()) {
+        // Creates a date without timezone offset issues
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+    
     function formatDateLocal(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${day}-${month}-${year}`;
+        // Returns YYYY-MM-DD format for storage
+        const localDate = getLocalDate(date);
+        return [
+        localDate.getFullYear(),
+        String(localDate.getMonth() + 1).padStart(2, '0'),
+        String(localDate.getDate()).padStart(2, '0')
+        ].join('-');
     }
-
+    
     function formatDateDDMMYYYY(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${day}-${month}-${year}`;
+        // For display purposes only
+        const localDate = getLocalDate(date);
+        return [
+        String(localDate.getDate()).padStart(2, '0'),
+        String(localDate.getMonth() + 1).padStart(2, '0'),
+        localDate.getFullYear()
+        ].join('.');
     }
 
-    function formatDateDisplay(date) {
-        return date.toLocaleDateString(undefined, {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    }
 
     // Calendar rendering functions
     async function renderCalendar(year = null, month = null) {
         const calendar = document.getElementById('calendar');
         calendar.innerHTML = '';
-    
-        const today = new Date();
+
+        // Get dates in local timezone
+        const today = getLocalDate();
         const currentYear = year ?? today.getFullYear();
         const currentMonth = month ?? today.getMonth();
     
@@ -139,25 +145,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Day cells
         for (let day = 1; day <= daysInMonth; day++) {
             const cell = document.createElement('div');
-            const cellDate = new Date(currentYear, currentMonth, day);
-            
-            cell.className = 'calendar-day';
-            if(cellDate > new Date()) cell.classList.add('disabled');
+            const cellDate = getLocalDate(new Date(currentYear, currentMonth, day));
+            const isToday = cellDate.getTime() === today.getTime();
+            const isFuture = cellDate > today;
+        
+            cell.className = `calendar-day ${isToday ? 'today' : ''} ${isFuture ? 'disabled' : ''}`;
             
             cell.innerHTML = `
-                <span class="date">${day}</span>
-                <div class="indicators"></div>
+              <span class="date">${day}</span>
+              <div class="indicators"></div>
             `;
-
+        
             cell.addEventListener('click', () => {
+              if (!isFuture) {
                 document.querySelectorAll('.calendar-day').forEach(c => c.classList.remove('active'));
                 cell.classList.add('active');
+                clickedDate = formatDateLocal(cellDate);
                 showDayDetails(currentYear, currentMonth, day);
+              }
             });
-    
+        
             grid.appendChild(cell);
         }
-    
+        
         calendar.appendChild(grid);
         await fillCalendar(currentYear, currentMonth);
     }
@@ -165,82 +175,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function fillCalendar(currentYear, currentMonth) {
         const user = auth.currentUser;
         if (!user) return;
-    
+      
         const userData = await getUserData(user.uid);
+        const today = getLocalDate();
+    
         const cycles = userData.gender === "Female" 
             ? await getCycleHistory(user.uid) 
             : userData.partner ? await getCycleHistory(userData.partner) : [];
     
-        const today = new Date();
-        const currentDate = formatDateLocal(today);
+        // Parse cycle dates for predictions
+        const parsedCycles = cycles.map(cycle => ({
+            startDate: new Date(cycle.startDate),
+            endDate: cycle.endDate ? new Date(cycle.endDate) : null
+        }));
     
         let predictionData = {};
-        if (cycles.length > 0) {
-            const lastCycle = cycles[0];
+        if (parsedCycles.length > 0) {
             predictionData = {
-                expectedPeriodStart: predictNextPeriod(cycles),
-                fertileWindow: calculateOvulationWindow(cycles)
+                expectedPeriodStart: predictNextPeriod(parsedCycles),
+                fertileWindow: calculateOvulationWindow(parsedCycles)
             };
         }
     
+        // Process each calendar day
         document.querySelectorAll('.calendar-day').forEach(async (cell, index) => {
-            const dayNumber = index + 1 - (new Date(currentYear, currentMonth, 1).getDay() - 2);
-            if (dayNumber < 1 || dayNumber > new Date(currentYear, currentMonth + 1, 0).getDate()) return;
+            const dayNumber = index + 1;
+            const cellDate = getLocalDate(new Date(currentYear, currentMonth, dayNumber));
+            
+            // Skip invalid dates
+            if (cellDate.getMonth() !== currentMonth) {
+              cell.classList.add('invalid');
+              return;
+            }
+        
+            const cellDateFormatted = formatDateLocal(cellDate);
+            const isToday = cellDate.getTime() === today.getTime();
+            
+            // Update today highlighting
+            cell.classList.toggle('today', isToday);
+            
+            // Skip future dates
+            if (cellDate > today) return;
     
-            const cellDate = new Date(currentYear, currentMonth, dayNumber);
-            const formattedDate = formatDateLocal(cellDate);
-            const isToday = formattedDate === currentDate;
+            // Check symptoms
+            const hasSymptoms = await checkSymptomsForDate(
+                userData.gender === "Female" ? user.uid : userData.partner, 
+                cellDateFormatted
+            );
     
-            // Check if date is in the future
-            if (cellDate > today) {
-                cell.classList.add('disabled');
-                return;
+            // Add indicators
+            if (hasSymptoms) {
+                indicators.appendChild(createIndicatorDot('symptoms'));
             }
     
-            // Get symptoms data
-            const hasSymptoms = userData.gender === "Female" 
-                ? await checkSymptomsForDate(user.uid, formattedDate)
-                : await checkSymptomsForDate(userData.partner, formattedDate);
-    
-            // Prediction calculations
-            let isPredictedPeriod = false;
-            let isFertile = false;
-            
+            // Add prediction indicators if available
             if (predictionData.expectedPeriodStart) {
                 const periodStart = new Date(predictionData.expectedPeriodStart);
                 const periodEnd = new Date(periodStart);
-                periodEnd.setDate(periodStart.getDate() + calculateAveragePeriodLength(cycles));
-                isPredictedPeriod = cellDate >= periodStart && cellDate <= periodEnd;
+                periodEnd.setDate(periodStart.getDate() + calculateAveragePeriodLength(parsedCycles));
+                
+                if (cellDate >= periodStart && cellDate <= periodEnd) {
+                    indicators.appendChild(createIndicatorDot('period'));
+                }
             }
     
             if (predictionData.fertileWindow) {
-                isFertile = cellDate >= predictionData.fertileWindow.ferStartDate &&
-                          cellDate <= predictionData.fertileWindow.ferEndDate;
-            }
-    
-            // Update cell styling
-            if (isToday) cell.classList.add('today');
-            const indicators = cell.querySelector('.indicators');
-            indicators.innerHTML = '';
-    
-            if (isPredictedPeriod) {
-                const periodDot = document.createElement('span');
-                periodDot.className = 'dot period';
-                indicators.appendChild(periodDot);
-            }
-    
-            if (isFertile) {
-                const fertileDot = document.createElement('span');
-                fertileDot.className = 'dot fertile';
-                indicators.appendChild(fertileDot);
-            }
-    
-            if (hasSymptoms) {
-                const symptomDot = document.createElement('span');
-                symptomDot.className = 'dot symptomsCell';
-                indicators.appendChild(symptomDot);
+                const ferStart = new Date(predictionData.fertileWindow.ferStartDate);
+                const ferEnd = new Date(predictionData.fertileWindow.ferEndDate);
+                
+                if (cellDate >= ferStart && cellDate <= ferEnd) {
+                    indicators.appendChild(createIndicatorDot('fertile'));
+                }
             }
         });
+    }
+    
+    // Helper function to create indicator dots
+    function createIndicatorDot(type) {
+        const dot = document.createElement('span');
+        dot.className = `dot ${type}`;
+        return dot;
     }
 
     async function showDayDetails(year, month, day) {
@@ -378,36 +392,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     startPeriodBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
-
-        const cycles = await getCycleHistory(user.uid);
-        const activeCycle = cycles.find(cycle => !cycle.endDate);
-
-        if (activeCycle) return alert("There's already an active period");
+      
+        // Ensure clickedDate is properly formatted
+        const startDate = formatDateLocal(new Date(clickedDate));
         
         await addCycleData(user.uid, {
-            startDate: clickedDate,
-            endDate: null,
-            timestamp: new Date()
+          startDate: startDate,
+          endDate: null,
+          timestamp: new Date()
         });
         
-        alert(`Period started on ${formatDateDisplay(new Date(clickedDate))}`);
         updateUi();
+        renderCalendar();
     });
 
     endPeriodBtn.addEventListener('click', async () => {
         const user = auth.currentUser;
         if (!user) return;
-
+    
         const cycles = await getCycleHistoryWithId(user.uid);
         const activeCycle = cycles.find(cycle => !cycle.endDate);
-
+    
         if (!activeCycle) return alert("No active period to end");
         
-        const cycleRef = doc(db, "users", user.uid, "cycles", activeCycle.id);
-        await updateDoc(cycleRef, { endDate: clickedDate });
+        await updateDoc(doc(db, "users", user.uid, "cycles", activeCycle.id), { 
+            endDate: clickedDate // Already in YYYY-MM-DD format
+        });
         
-        alert(`Period ended on ${formatDateDisplay(new Date(clickedDate))}`);
-        renderCycleHistory(await getCycleHistory(user.uid));
+        updateUi();
+        renderCalendar();
     });
 
     saveSymptomsBtn.addEventListener('click', async () => {

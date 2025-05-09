@@ -4,7 +4,7 @@ self.addEventListener('install', (event) => {
             const urlsToCache = [
                 '/LunaCycle/index.html',  // Explicitly reference index.html
                 '/LunaCycle/styles.css',
-                '/LunaCycle/main.js',
+                '/LunaCycle/dash.js',
                 '/LunaCycle/icons/AppIcon128.png'
             ];
             

@@ -1,4 +1,3 @@
-// ui.js
 import {getUserData, getCycleHistory, getSymptomsHistory, updateInvitationStatus, updateUserPartner, getPendingInvitations} from './firestore.js';
 import { auth } from './firebaseConfig.js';
 import { predictNextPeriod, calculateCycleStats, getCurrentCyclePhase, getNutritionTips } from './utils.js';
@@ -6,7 +5,7 @@ import { predictNextPeriod, calculateCycleStats, getCurrentCyclePhase, getNutrit
 export function showDashboard(userData) {
     if (!userData) {
         console.error("User data is null or undefined.");
-        return; // Exit the function if userData is null
+        return;
     }
     document.getElementById('dashboard').style.display = 'block';
     document.getElementById('username').textContent = userData.username;
@@ -22,47 +21,93 @@ export function renderCycleHistory(cycles) {
     const cycleHistory = document.getElementById('cycle-history');
     let counter = 0;
     if(cycles.length != 0) cycleHistory.innerHTML = '';
+    
     cycles.forEach(cycle => {
         counter++;
         if(counter >= 4){
             return;
         }
         const li = document.createElement('li');
-        let [year, month, day] = cycle.startDate.split('-');
-        const startString = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+        
+        // Handle Date object or string
+        const startDate = cycle.startDate instanceof Date ? cycle.startDate : new Date(cycle.startDate);
+        const startString = formatDateDDMMYYYY(startDate);
+        
         let endString = "active";
         if(cycle.endDate !== null){
-            [year, month, day] = cycle.endDate.split('-');
-            endString = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+            const endDate = cycle.endDate instanceof Date ? cycle.endDate : new Date(cycle.endDate);
+            endString = formatDateDDMMYYYY(endDate);
         }
+        
         li.innerHTML = `
             <strong>Start:</strong> ${startString},<br> <strong>End:</strong> ${endString}<br>
         `;
         cycleHistory.appendChild(li);
-
     });
+}
+
+// Add this helper function if not already in your file
+function formatDateDDMMYYYY(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
 }
 
 export function renderSymptomsHistory(symptoms) {
     const symptomsHistory = document.getElementById('symptoms-history');
     symptomsHistory.innerHTML = '';
-    let counter = 0;
-    symptoms.forEach(symptom => {
-        counter++;
-        if(counter >= 4){
-            return;
-        }
-        const [year, month, day] = symptom.date.split('-');
-        const sympDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>Date:</strong> ${sympDate|| 'None'}<br>
-            <strong>Emotion:</strong> ${symptom.feeling || 'None'}<br>
-            <strong>Symptoms:</strong> ${symptom.symptoms?.join(', ') || 'None'}<br>
-            <strong>Flow:</strong> ${symptom.flow || 'Not specified'}
-        `;
-        symptomsHistory.appendChild(li);
+    
+    if (!symptoms || !Array.isArray(symptoms) || symptoms.length === 0) {
+    symptomsHistory.innerHTML = '<li class="no-symptoms">No symptoms recorded yet</li>';
+    return;
+    }
 
+    symptoms.slice(0, 4).forEach(symptom => {
+    const li = document.createElement('li');
+    li.className = 'symptom-entry';
+    
+    // Date display logic
+    let displayDate = 'Date not available';
+    try {
+        if (symptom.date) {
+        // Handle all possible date formats
+        let dateParts;
+        
+        if (typeof symptom.date === 'string') {
+            if (symptom.date.includes('-')) {
+            dateParts = symptom.date.split('-');
+            // Reformat YYYY-MM-DD to DD-MM-YYYY
+            if (dateParts.length === 3) {
+                displayDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+            }
+            } else if (symptom.date.includes('/')) {
+            dateParts = symptom.date.split('/');
+            // Handle DD/MM/YYYY format
+            if (dateParts.length === 3) {
+                displayDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+            }
+            }
+        } else if (symptom.date instanceof Date) {
+            // Format JS Date object directly
+            displayDate = `${String(symptom.date.getDate()).padStart(2, '0')}-${
+            String(symptom.date.getMonth() + 1).padStart(2, '0')}-${
+            symptom.date.getFullYear()}`;
+        }
+        }
+    } catch (error) {
+        console.error('Date formatting error:', error);
+    }
+
+    li.innerHTML = `
+        <div class="symptom-date">📅 ${displayDate}</div>
+        <div class="symptom-details">
+        <div>😊 ${symptom.feeling || 'No emotion recorded'}</div>
+        <div>🩺 ${symptom.symptoms?.join(', ') || 'No symptoms'}</div>
+        <div>🔴 ${symptom.flow || 'Flow not specified'}</div>
+        </div>
+    `;
+    symptomsHistory.appendChild(li);
     });
 }
 
